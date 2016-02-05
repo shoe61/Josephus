@@ -1,0 +1,21 @@
+//Scott Schumacher
+
+#include"LinkList.h"
+using namespace std;
+
+
+
+int main()
+{
+	LinkList list;
+	
+	list.create();
+
+	
+		
+	list.menu();	
+
+	system("pause");
+	
+	return 0;
+}
