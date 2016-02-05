@@ -1,0 +1,38 @@
+//Scott Schumacher
+
+#include<string>
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+class LinkList
+{
+protected:
+	//declare a structure for the linked list
+	struct LetterNode
+	{
+		char letter;
+		LetterNode *next;
+		LetterNode(char letter1, LetterNode *next1 = NULL)
+		{
+			letter = letter1;
+			next = next1;
+		}
+	};
+
+	LetterNode *head,*tail,*temp;		//List head pointer
+	int count;
+
+public:
+	LinkList(){ head = NULL; }	//constructor
+	~LinkList();
+	void remove();
+	void simpleRemove(char);
+	void compoundRemove(char, int);
+	void sort();
+	void create();
+	void displayList() const;
+	void insert();
+	void menu();
+	void destroy();
+};
