@@ -1,0 +1,472 @@
+//Scott Schumacher
+
+#include"LinkList.h"
+#include<string>
+using namespace std;
+
+void LinkList::create()
+{
+	//declare character variable and character array to receive the word
+	char word[25];
+
+	//invite the operator to enter a word
+	cout << "Please enter a word:\t";
+
+	cin >> word; cout << endl;
+
+	//traverse the character array, display each letter for verification,
+	//and create a node for each letter
+	char *ptr = word; int i = 0;
+	while (ptr[i])
+	{
+		//cout << "letter: " << ptr[i] << endl;
+
+		//if no nodes exist, first node is head
+		if (head == NULL)
+		{
+			head = new LetterNode(ptr[i], NULL);
+
+		}
+		//append new node at end of list
+		else
+		{
+
+			LetterNode *nodePtr = head;
+
+
+			while (nodePtr->next != NULL)
+				nodePtr = nodePtr->next;
+
+
+			nodePtr->next = new LetterNode(ptr[i]);
+
+		}
+
+
+		i++;
+	}
+	//this section steps through the linked list and makes the last node point to the first,
+	//making it a circular linked list.
+
+	tail = head;
+
+	for (int k = 0; k < i - 1; k++)
+	{
+		//cout << tail->letter << "  " << tail << "  " << tail->next<<endl;
+		tail = tail->next;
+
+	}
+	tail->next = head; //the end points to the beginnig
+
+	//calls the displayList function to show the contents of the list
+	cout << "******************************************************************************" << endl << endl;
+	cout << "Here's what your linked list looks like:                     " << endl << endl << endl;
+
+	displayList();
+
+	menu();
+
+}
+
+void LinkList::displayList() const
+{
+
+
+	int i = 0;
+	LetterNode *nodePtr = head;	//start at the head of the list
+	//count the nodes and determine the tail address
+	LetterNode *counter = nodePtr;
+	while (counter->next != head)
+	{
+		counter = counter->next;
+		i++;
+	}
+
+	//prints out the node numbers as column heading
+	for (int j = 0; j <= i; j++)
+	{
+
+		cout << j << '\t';
+	}
+	cout << endl << endl;
+
+	//prints the letter in each node below its node number
+	for (int j = 0; j <= i; j++)
+	{
+		cout << nodePtr->letter << '\t';
+		nodePtr = nodePtr->next;
+	}
+	cout << endl << endl;
+
+
+	cout << endl << "Your list has " << i + 1 << "nodes" << endl;
+	cout << "Node 0 address is " << head << " and it has a " << head->letter << "." << endl;
+	cout << "The tail is node " << i << " and it has a " << (counter)->letter << "." << endl;
+	cout << "The tail is pointing to address " << counter->next << "." << endl << endl << endl;
+	cout << "******************************************************************************" << endl << endl;
+
+}
+
+void LinkList::insert()
+{
+	char letter1;
+	int node1;
+	cout << "Please enter the letter you'd like to insert." << '\t';
+	cin >> letter1;
+	cout << "Please specify the insertion node." << '\t';
+	cin >> node1;
+
+	cout << "******************************************************************************" << endl << endl;
+	cout << "List before insertion:                     " << endl << endl << endl;
+
+	displayList();
+
+	LetterNode *NodePtr = head;
+	LetterNode *PrevNodePtr = NodePtr;
+
+	for (int i = 0; i < node1; i++)
+	{
+		NodePtr = NodePtr->next;
+	}
+	for (int i = 0; i < node1 - 1; i++)
+	{
+		PrevNodePtr = PrevNodePtr->next;
+	}
+	PrevNodePtr->next = new LetterNode(letter1, NodePtr);
+
+	cout << "******************************************************************************" << endl << endl;
+	cout << "Here's what your linked list after insertion:                     " << endl << endl << endl;
+
+	displayList();
+	menu();
+
+
+}
+
+void LinkList::remove()
+{
+	char letter1;
+	cout << "Please enter the letter that you want removed.\t";
+	cin >> letter1;
+
+	LetterNode *nodePtr = head;
+	LetterNode *tail = nodePtr;
+	LetterNode *trash = nodePtr;
+
+	//count the occurences of the letter
+
+	int letterCount = 0;
+
+	if (head->letter == letter1)
+		letterCount++;
+
+	while (nodePtr->next != tail)
+	{
+		nodePtr = nodePtr->next;
+		if (nodePtr->letter == letter1)
+		{
+			letterCount++;
+		}
+
+	}
+	cout << endl << "LETTERCOUNT: " << letterCount << endl << endl;
+
+
+	//simple removals, where the selected letter occurs only once,
+	// and compound removals, where the letter occurs more than once 
+	//in the word, are handled by separate functions
+	if (letterCount == 1)
+		simpleRemove(letter1);
+	else
+		compoundRemove(letter1, letterCount);
+}
+
+void LinkList::simpleRemove(char letter1)
+{
+	LetterNode *nodePtr = head;
+	LetterNode *tail = nodePtr;
+	LetterNode *trash = nodePtr;
+
+	//if the letter to be removed is in the first (head) node,
+	//the head must be moved first.
+	if (trash->letter == letter1)
+	{
+		head = head->next;
+		while (tail->next != trash)
+		{
+			tail = tail->next;
+		}
+		tail->next = trash->next;
+
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List before deletion:                     " << endl << endl << endl;
+
+		displayList();
+
+		nodePtr->next = trash->next;
+		delete trash;
+
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List after deletion:                     " << endl << endl << endl;
+
+		displayList();
+
+		menu();
+
+	}
+	else //the letter to be removed is elsewhere
+	{
+		trash = head->next;
+		nodePtr = head;
+		while (trash->letter != letter1)
+		{
+			trash = trash->next;
+			nodePtr = nodePtr->next;
+
+		}
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List before deletion:                     " << endl << endl << endl;
+
+		displayList();
+
+		nodePtr->next = trash->next;
+		delete trash;
+	}
+
+	cout << "******************************************************************************" << endl << endl;
+	cout << "List after deletion:                     " << endl << endl << endl;
+
+	displayList();
+
+	menu();
+}
+
+void LinkList::compoundRemove(char letter1, int letterCount)
+{
+	cout << "Looks like you want to remove the " << letter1 << ", but which one? ";
+	cout << "Please specifiy by number" << endl << "the node you want deleted. \t";
+	int node1;
+	cin >> node1; cout << endl;
+
+	cout << "okay, remove the '" << letter1 << "' at node " << node1 << "." << endl << endl;
+
+	//if the node to be removed is node zero:
+	if (node1 == 0)
+	{
+		LetterNode *nodePtr = head;
+		LetterNode *tail = nodePtr;
+		LetterNode *trash = nodePtr;
+
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List before deletion:                     " << endl << endl << endl;
+		displayList();
+
+		head = head->next;
+		while (tail->next != nodePtr)
+		{
+			tail = tail->next;
+		}
+
+		tail->next = nodePtr->next;
+		delete nodePtr;
+
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List after deletion:                     " << endl << endl << endl;
+
+		displayList();
+
+		menu();
+	}
+	//for all other cases but node zero
+	else
+	{
+		cout << "node1 selected as " << node1 << endl;
+		LetterNode *nodePtr = head;
+		LetterNode *tail = nodePtr;
+		LetterNode *trash = nodePtr;
+
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List before deletion:                     " << endl << endl << endl;
+		displayList();
+
+		for (int i = 0; i < node1; i++)
+		{
+			nodePtr = trash;
+			trash = trash->next;
+		}
+		nodePtr->next = trash->next;
+		delete trash;
+
+		cout << "******************************************************************************" << endl << endl;
+		cout << "List after deletion:                     " << endl << endl << endl;
+
+		displayList();
+
+		menu();
+
+	}
+
+
+
+
+
+
+}
+
+void LinkList::sort()
+{
+	LetterNode *nodePtr = head;
+	LetterNode *prevNodePtr = nodePtr;
+	LetterNode *temp = nodePtr;
+
+	//display the list before sorting:
+	cout << "******************************************************************************" << endl << endl;
+	cout << "List before sorting:                     " << endl << endl << endl;
+	displayList();
+	
+	//move prevNodePtr all the way around to be on hand to perform insertions
+	while (prevNodePtr->next != temp)
+		prevNodePtr = prevNodePtr->next;
+
+	//create an empty node to use as a swap space
+	prevNodePtr->next = new LetterNode(NULL, temp);
+	LetterNode *spare = prevNodePtr->next;
+
+	//now there's a node between prev and node; advance prev by one
+
+	prevNodePtr = prevNodePtr->next;
+
+	//set nodePter and prevNodePter to head+1 and head, respectively
+	nodePtr = nodePtr->next;
+	prevNodePtr = prevNodePtr->next;
+
+	//Now, set up a bool-controlled loop to advance through the list, comparing
+	//the values in prevNodePtr and nodePtr. If nodePtr is lower, replace prevNodePter with nodePtr.
+	//The loop must continue until no positions are changed-swap will be false.
+
+	bool swap = true;
+
+	while (swap == true)
+	{
+		nodePtr = nodePtr->next;
+		prevNodePtr = prevNodePtr->next;
+		nodePtr = nodePtr->next;
+		prevNodePtr = prevNodePtr->next;
+		swap = false;
+
+		while (nodePtr->next != temp)  //traverses the circular list
+		{
+			if (nodePtr->letter < prevNodePtr->letter) //compares
+			{
+				spare->letter = prevNodePtr->letter;  //swaps the letters
+				prevNodePtr->letter = nodePtr->letter;
+				nodePtr->letter = spare->letter;
+				spare->letter = NULL;
+				swap = true;
+			}
+			nodePtr = nodePtr->next;
+			prevNodePtr = prevNodePtr->next;
+		}
+	}
+
+	//remove the spare node now that it's no longer needed
+	nodePtr = head;
+	prevNodePtr = nodePtr;
+	temp = nodePtr;
+
+	while (prevNodePtr->next != spare) //traverse the list to spare
+	{
+		prevNodePtr = prevNodePtr->next;
+	}
+	
+	prevNodePtr->next = spare->next; //unhook and delete spare
+	delete spare;
+		
+	//display the list after sorting:
+	cout << "******************************************************************************" << endl << endl;
+	cout << "List after sorting:                     " << endl << endl << endl;
+	displayList();
+
+	menu();
+}
+
+void LinkList::destroy()
+{
+	LetterNode *nodePtr = head;	//start at the head of the list
+	LetterNode *prevNodePtr = head;
+	
+	
+	while (nodePtr != NULL)
+	{
+		LetterNode *trash = nodePtr;
+		nodePtr = nodePtr->next;
+		delete trash;
+	}
+		
+		
+		
+		
+		
+	
+	
+	
+	
+	
+	
+
+	
+	
+
+	
+
+}
+
+
+void LinkList::menu()
+{
+
+
+	cout << '\t' << "A-  Insert a new node wherever you choose;" << endl;
+	cout << '\t' << "B-  Remove a node from any location;" << endl;
+	cout << '\t' << "C-  Order the vowels and consonants respectively in alphabetical order;" << endl;
+	cout << '\t' << "D-  Destroy the list; or" << endl;
+	cout << '\t' << "E-  Quit." << endl << endl << endl;
+
+	char choice;
+
+	cin >> choice;
+	choice = toupper(choice);
+
+
+	switch (choice)
+	{
+	case 'A':cout << endl<< "You chose to insert a letter. " << endl; insert();
+		break;
+	case 'B':cout <<endl<< "You chose to remove a node." << endl; remove();
+		break;
+	case 'C':cout<<endl << "You chose to sort the list." << endl; sort();
+		break;
+	case 'D':cout<<endl << "You chose to destroy the list." << endl; //destroy();
+		break;
+	case 'E':cout << "The program will probably exit before you can";
+		     cout<<"read this." << endl; exit(0);
+		break;
+	}
+
+}
+
+
+LinkList::~LinkList()
+{
+	LetterNode *nodePtr = head;	//start at the head of the list
+	while (nodePtr != NULL)
+	{
+		//garbage keeps track of the node to be deleted
+		LetterNode *garbage = nodePtr;
+		//move on to the next node, if applicable
+		nodePtr = nodePtr->next;
+		//delete the "garbage" node
+		delete garbage;
+	}
+}
+
